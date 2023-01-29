@@ -22,6 +22,6 @@ services:
       context: ./
       dockerfile: Dockerfile
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://evalspringsecdb:3306/evalspringsecdb?autoReconnect=true&useSSL=false
+      SPRING_DATASOURCE_URL: jdbc:mysql://evalSpringMysqlSec:3306/evalspringsecdb?autoReconnect=true&useSSL=false
     depends_on:
       - evalSpringMysqlSec

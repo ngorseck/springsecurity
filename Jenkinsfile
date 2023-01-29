@@ -21,7 +21,7 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', passwordVariable: 'DOCKER_HUB_PASSWORD', usernameVariable: 'DOCKER_HUB_USERNAME')]) {
                     sh "/Applications/Docker.app/Contents/Resources/bin/docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD"
                     sh "/Applications/Docker.app/Contents/Resources/bin/docker tag evalspringse:latest ngorseck/evalspringse:v1"
-                    sh "/Applications/Docker.app/Contents/Resources/bin/docker-compose/docker-compose push"
+                    sh "/Applications/Docker.app/Contents/Resources/bin/docker push ngorseck/evalspringse:v1"
                }
             }
        }

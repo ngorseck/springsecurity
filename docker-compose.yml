@@ -12,7 +12,7 @@ services:
     ports:
       - 3306:3306
 
-  evalsespringc:
+  evalsespringsec:
     image: evalspringse:latest
     container_name: container_evalspringsec
     ports:

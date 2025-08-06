@@ -5,7 +5,6 @@ pipeline {
             args '-u root'
         }
       }
-    def app
     stages {
         stage('Build') {
             steps {
@@ -17,7 +16,7 @@ pipeline {
                  sh "mvn test"
             }
         }
-        /* stage('Push to Docker Hub') {
+        stage('Push to Docker Hub') {
              agent { dockerfile true }
              steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', passwordVariable: 'DOCKER_HUB_PASSWORD', usernameVariable: 'DOCKER_HUB_USERNAME')]) {
@@ -26,21 +25,6 @@ pipeline {
                     sh "docker push ngorseck/evalspringsecu:v$BUILD_NUMBER"
                }
             }
-       } */
-
-        stage('Build image') {
-           app = docker.build("ngorseck/evalspringsecu")
-        }
-        stage('Test image') {
-          app.inside {
-            sh 'echo "Tests passed"'
-          }
-        }
-        stage('Push image') {
-          docker.withRegistry('https://registry.hub.docker.com', 'credentialsId') {
-            app.push("${env.BUILD_NUMBER}")
-            app.push("latest")
-          }
-        }
+       }
     }
 }

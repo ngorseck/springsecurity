@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
     build:
       context: ./
-      dockerfile: App.Dockerfile
+      dockerfile: Dockerfile
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://evalSpringMysqlSec:3306/evalspringsecdb?autoReconnect=true&useSSL=false
     depends_on:

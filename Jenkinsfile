@@ -1,27 +1,27 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.11-eclipse-temurin-8-alpine'
-            args '-u root'
-        }
-      }
+    agent any
     stages {
-        stage('Build') {
+        stage(‘Build’) {
             steps {
-                 sh "mvn clean package -DskipTests"
+                 sh "/opt/apache-maven/bin/mvn clean package"
             }
         }
-        stage('Test') {
+        stage(‘Test’) {
             steps {
-                 sh "mvn test"
+                 sh "/opt/apache-maven/bin/mvn test"
+            }
+        }
+        stage('Deploy') {
+            steps {
+                sh '/Applications/Docker.app/Contents/Resources/bin/docker-compose/docker-compose up -d --build'
             }
         }
         stage('Push to Docker Hub') {
-             steps {
+            steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', passwordVariable: 'DOCKER_HUB_PASSWORD', usernameVariable: 'DOCKER_HUB_USERNAME')]) {
-                    sh "docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD"
-                    sh "docker build -t ngorseck/evalspringsecu:v$BUILD_NUMBER ."
-                    sh "docker push ngorseck/evalspringsecu:v$BUILD_NUMBER"
+                    sh "/Applications/Docker.app/Contents/Resources/bin/docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD"
+                    sh "/Applications/Docker.app/Contents/Resources/bin/docker tag evalspringse:latest ngorseck/evalspringse:v$BUILD_NUMBER"
+                    sh "/Applications/Docker.app/Contents/Resources/bin/docker push ngorseck/evalspringse:v$BUILD_NUMBER"
                }
             }
        }

@@ -5,6 +5,7 @@ pipeline {
             args '-u root'
         }
       }
+    def app
     stages {
         stage('Build') {
             steps {
@@ -26,7 +27,7 @@ pipeline {
                }
             }
        } */
-       def app
+
         stage('Build image') {
            app = docker.build("ngorseck/evalspringsecu")
         }

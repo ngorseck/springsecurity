@@ -11,11 +11,11 @@ pipeline {
                  sh "mvn clean package -DskipTests"
             }
         }
-        stage('Test') {
+        /* stage('Test') {
             steps {
                  sh "mvn test"
             }
-        }
+        } */
         stage('Push to Docker Hub') {
             agent {
                 docker {

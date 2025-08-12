@@ -33,7 +33,7 @@ pipeline {
        }
     }
      post {
-        succes {
+        success {
            echo "Pipeline build successfuly"
         }
         failure {

@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             agent {
-                label 'docker-enable'
+                label 'docker-enabled'
             } // Un noeud avec Docker
             steps {
                 git branch: 'main', url: 'https://github.com/ngorseck/springsecurity.git'

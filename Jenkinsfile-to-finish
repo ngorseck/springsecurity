@@ -1,8 +1,16 @@
 pipeline {
-    // Chaque stage choisit son propre env
+    // Chaque stage choisit sont propre env
     agent none
     stages {
-        stage('Build') {
+        stage('Checkout') {
+            agent {
+                label 'docker-enabled'
+            } // Un noeud avec Docker
+            steps {
+                git branch: 'main', url: 'https://github.com/ngorseck/springsecurity.git'
+            }
+        }
+        stage('Build Maven') {
             agent {
                 docker {
                     image 'maven:3.9.11-eclipse-temurin-8-alpine'
@@ -10,7 +18,7 @@ pipeline {
                 }
             }
             steps {
-                 sh "mvn clean package -DskipTests"
+                sh "mvn clean package -DskipTests"
             }
         }
         /* stage('Test') {
@@ -25,21 +33,21 @@ pipeline {
                     args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
-             steps {
+            steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', passwordVariable: 'DOCKER_HUB_PASSWORD', usernameVariable: 'DOCKER_HUB_USERNAME')]) {
                     sh "docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD"
                     sh "docker build -t ngorseck/evalspringsecu:v$BUILD_NUMBER ."
                     sh "docker push ngorseck/evalspringsecu:v$BUILD_NUMBER"
                }
-            }
+           }
        }
     }
-     post {
-        success {
+    post {
+       success {
            echo "Pipeline build successfuly"
-        }
-        failure {
+       }
+       failure {
            echo "Pipeline failed"
-        }
-     }
+       }
+    }
 }

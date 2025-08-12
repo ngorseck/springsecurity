@@ -2,7 +2,7 @@ pipeline {
     // Chaque stage choisit son propre env
     agent none
     stages {
-        stage('Build') {
+        stage('Build Maven') {
             agent {
                 docker {
                     image 'maven:3.9.11-eclipse-temurin-8-alpine'
@@ -13,11 +13,17 @@ pipeline {
                  sh "mvn clean package -DskipTests"
             }
         }
-        /* stage('Test') {
-            steps {
-                 sh "mvn test"
+        stage('Unit Test') {
+            agent {
+                docker {
+                    image 'maven:3.9.11-eclipse-temurin-8-alpine'
+                    args '-u root -v $HOME/.m2:/root/.m2'
+                }
             }
-        } */
+            steps {
+                sh "mvn test"
+            }
+        }
         stage('Push to Docker Hub') {
             agent {
                 docker {

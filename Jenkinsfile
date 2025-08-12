@@ -1,5 +1,6 @@
 pipeline {
-
+    // Chaque stage choisit sont propre env
+    agent none
     stages {
         stage('Checkout') {
             agent {
@@ -17,7 +18,7 @@ pipeline {
                 }
             }
             steps {
-                 sh "mvn clean package -DskipTests"
+                sh "mvn clean package -DskipTests"
             }
         }
         /* stage('Test') {
@@ -32,21 +33,21 @@ pipeline {
                     args '--privileged -v /var/run/docker.sock:/var/run/docker.sock'
                 }
             }
-             steps {
+            steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', passwordVariable: 'DOCKER_HUB_PASSWORD', usernameVariable: 'DOCKER_HUB_USERNAME')]) {
                     sh "docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD"
                     sh "docker build -t ngorseck/evalspringsecu:v$BUILD_NUMBER ."
                     sh "docker push ngorseck/evalspringsecu:v$BUILD_NUMBER"
                }
-            }
+           }
        }
     }
-     post {
-        success {
+    post {
+       success {
            echo "Pipeline build successfuly"
-        }
-        failure {
+       }
+       failure {
            echo "Pipeline failed"
-        }
-     }
+       }
+    }
 }

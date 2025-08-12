@@ -1,12 +1,21 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.11-eclipse-temurin-8-alpine'
-            args '-u root'
-        }
-      }
+
     stages {
-        stage('Build') {
+        stage('Checkout') {
+            agent {
+                label 'docker-enable'
+            } // Un noeud avec Docker
+            steps {
+                git branch: 'main', url: 'https://github.com/ngorseck/springsecurity.git'
+            }
+        }
+        stage('Build Maven') {
+            agent {
+                docker {
+                    image 'maven:3.9.11-eclipse-temurin-8-alpine'
+                    args '-u root -v $HOME/.m2:/root/.m2'
+                }
+            }
             steps {
                  sh "mvn clean package -DskipTests"
             }

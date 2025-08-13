@@ -1,0 +1,12 @@
+resources:
+  - namespace.yaml
+  - deploy.yaml
+
+#kubectl apply -k ./
+#kubectl delete -k ./
+
+#########PATIENTER UN MOMENT LE TEMPS QUE LA BASE SOIT MISE EN PLACE
+#########IL EST POSSIBLE QUE LE POD DE LAPP SOIT DOWN, VOUS DEVEZ JUSTE LE REDEMARRER
+#minikube dashboard
+#minikube ip
+#http://<minikube-ip>:30080 

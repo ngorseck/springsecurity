@@ -1,0 +1,47 @@
+services:
+  mysql-evalSpringMysqlSec:
+    image: mysql:8.0
+    container_name: container-evalspringmysqlsec
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: evalspringsecdb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data_evalSpringMysqlSec:/var/lib/mysql
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+
+  phpmyadmin-evalSpringMysqlSec:
+    container_name: phpmyadmin-evalSpringMysqlSec
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - "8085:80"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      PMA_HOST: mysql-evalSpringMysqlSec
+      PMA_USER: user
+      PMA_PASSWORD: user
+    depends_on:
+      - mysql-evalSpringMysqlSec
+    restart: unless-stopped
+
+  app-evalsespringsec:
+    image: evalspringse:latest
+    container_name: container-evalspringsec
+    ports:
+      - "8087:8087"
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-evalSpringMysqlSec:3306/evalspringsecdb?autoReconnect=true&useSSL=false
+    depends_on:
+      - mysql-evalSpringMysqlSec
+
+volumes:
+  mysql_data_evalSpringMysqlSec:
+    driver: local

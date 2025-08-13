@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>sn.minfinances</groupId>
-	<artifactId>evalsecurrity</artifactId>
+	<artifactId>evalsecurity</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>evalsecurrity</name>
 	<description>Demo project for Spring Boot</description>
@@ -67,6 +67,7 @@
 	</dependencies>
 
 	<build>
+		<finalName>evalsecurity</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

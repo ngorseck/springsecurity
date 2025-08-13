@@ -1,0 +1,109 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-springsecurity-pvc
+  namespace: ns-app-springsecurity
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-springsecurity
+  namespace: ns-app-springsecurity
+spec:
+  selector:
+    matchLabels:
+      app: mysql-springsecurity
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mysql-springsecurity
+    spec:
+      containers:
+        - name: mysql-springsecurity
+          image: mysql:8.0
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: root
+            - name: MYSQL_DATABASE
+              value: evalspringsecdb
+            - name: MYSQL_USER
+              value: user
+            - name: MYSQL_PASSWORD
+              value: user
+          ports:
+            - containerPort: 3306
+          volumeMounts:
+            - name: mysql-storage-springsecurity
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-storage-springsecurity
+          persistentVolumeClaim:
+            claimName: mysql-springsecurity-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-springsecurity
+  namespace: ns-app-springsecurity
+spec:
+  selector:
+    app: mysql-springsecurity
+  ports:
+    - port: 3306
+      targetPort: 3306
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-springsecurity
+  namespace: ns-app-springsecurity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-springsecurity
+  template:
+    metadata:
+      labels:
+        app: app-springsecurity
+    spec:
+      containers:
+        - name: app-springsecurity
+          image: ngorseck/app-evalsecurity:2.0.0-latest
+          # This will use local image from minikube image list
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8087
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:mysql://mysql-springsecurity:3306/evalspringsecdb
+            - name: SPRING_DATASOURCE_USERNAME
+              value: user
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: user
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-springsecurity
+  namespace: ns-app-springsecurity
+spec:
+  selector:
+    app: app-springsecurity
+  ports:
+    - port: 80
+      targetPort: 8087
+      nodePort: 30080
+  type: NodePort
+
+#minikube service --url app-springsecurity -n ns-app-springsecurity
+#minikube ip
+#http://<minikube-ip>:30080

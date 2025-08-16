@@ -1,39 +1,51 @@
 pipeline {
-    agent any
-
-    tools {
-        maven 'Maven-3.9.0'
-        jdk 'OpenJDK-17'
-    }
-
+    // Chaque stage choisit son propre env
+    agent none
     stages {
-        stage('Build') {
+        stage('Build Maven') {
+            agent {
+                docker {
+                    image 'maven:3.9.11-eclipse-temurin-8-alpine'
+                    args '-u root -v $HOME/.m2:/root/.m2'
+                }
+            }
             steps {
-                echo 'Building the project...'
-                sh "mvn clean package"
+                 sh "mvn clean package -DskipTests"
             }
         }
-        stage('Test') {
+        stage('Unit Test') {
+            agent {
+                docker {
+                    image 'maven:3.9.11-eclipse-temurin-8-alpine'
+                    args '-u root -v $HOME/.m2:/root/.m2'
+                }
+            }
             steps {
-                echo 'Running tests...'
                 sh "mvn test"
             }
         }
-        stage('Deploy') {
-            steps {
-                echo 'Deploying with Docker Compose...'
-                sh 'docker-compose up -d --build'
-            }
-        }
         stage('Push to Docker Hub') {
-            steps {
-                echo 'Pushing to Docker Hub...'
+            agent {
+                docker {
+                    image 'docker:25.0.3'
+                    args '-u root -v /var/run/docker.sock:/var/run/docker.sock'
+                }
+            }
+             steps {
                 withCredentials([usernamePassword(credentialsId: 'dockerhub_credentials', passwordVariable: 'DOCKER_HUB_PASSWORD', usernameVariable: 'DOCKER_HUB_USERNAME')]) {
                     sh "docker login -u $DOCKER_HUB_USERNAME -p $DOCKER_HUB_PASSWORD"
-                    sh "docker tag evalspringse:latest bounafode/evalspringse:v$BUILD_NUMBER"
-                    sh "docker push bounafode/evalspringse:v$BUILD_NUMBER"
+                    sh "docker build -t bounafode/evalspringsecu:v$BUILD_NUMBER ."
+                    sh "docker push bounafode/evalspringsecu:v$BUILD_NUMBER"
                }
             }
        }
     }
+     post {
+        success {
+           echo "Pipeline build successfuly"
+        }
+        failure {
+           echo "Pipeline failed"
+        }
+     }
 }

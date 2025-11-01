@@ -52,10 +52,11 @@ pipeline {
                    //Private Key : Enter directly → colle le contenu de jenkins_deploy_key.
                    //ID : remote_ssh_key (comme dans ton Jenkinsfile)
                 // Clé publique : doit être ajoutée sur le serveur distant dans ~/.ssh/authorized_keys de l’utilisateur cible (user@remote.server.com).
-                   sshagent(['remote_ssh_key']) {
+                   //sshagent(['remote_ssh_key']) { //oubien installer le plugin sshagent
                    // Commande distante (tu peux modifier selon ton script)
+                   // /idrsa doit etre montee comme un volume
                    sh """
-                       ssh -o StrictHostKeyChecking=no user@remote.server.com '
+                       ssh -i /idrsa -o StrictHostKeyChecking=no user@remote.server.com '
                        cd /home/user/app &&
                        docker pull ngorseck/evalspringsecu:v$BUILD_NUMBER &&
                        docker stop evalspringsecu || true &&
@@ -63,7 +64,7 @@ pipeline {
                        docker run -d --name evalspringsecu -p 8080:8080 ngorseck/evalspringsecu:v$BUILD_NUMBER
                        '
                    """
-                }
+                // }
             }
        }
        stage('Deploy on Remote Server') {
@@ -77,9 +78,10 @@ pipeline {
                    )
 
                    if (userInput != null) {
-                       sshagent(['remote_ssh_key']) {
+                       // sshagent(['remote_ssh_key']) { //oubien installer le plugin sshagent
+                       // /idrsa doit etre montee comme un volume
                            sh """
-                               ssh -o StrictHostKeyChecking=no user@remote.server.com '
+                               ssh -i /idrsa -o StrictHostKeyChecking=no user@remote.server.com '
                                cd /home/user/app &&
                                docker pull ngorseck/evalspringsecu:v$BUILD_NUMBER &&
                                docker stop evalspringsecu || true &&
@@ -87,7 +89,7 @@ pipeline {
                                docker run -d --name evalspringsecu -p 8080:8080 ngorseck/evalspringsecu:v$BUILD_NUMBER
                                '
                            """
-                       }
+                       // }
                    }
                }
            }
